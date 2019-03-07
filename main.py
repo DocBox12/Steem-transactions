@@ -79,8 +79,6 @@ def create_sql():
     
     """)
 
-    cursor = mariadb_connection.cursor()
-
     cursor.execute(create_claim_rewards)
     mariadb_connection.commit()
 
@@ -89,10 +87,6 @@ def create_sql():
 
     cursor.execute(create_transfers)
     mariadb_connection.commit()
-
-    mariadb_connection.close()
-
-
     
     return
 
@@ -100,8 +94,6 @@ def create_sql():
 
 
 def get_claim_rewards():
-    cursor = mariadb_connection.cursor()
-
     all_transactions = Account(steem_username, steem).get_account_history(-1, INT_steem_limit, filter_by='claim_reward_balance', raw_output=True)
 
     for data in all_transactions:
@@ -147,14 +139,10 @@ def get_claim_rewards():
         cursor.execute(sql_insert)
         mariadb_connection.commit()
 
-    mariadb_connection.close()
-
         
     return
 
 def get_fill_order():
-    cursor = mariadb_connection.cursor()
-
     all_transactions = Account(steem_username, steem).get_account_history(-1, INT_steem_limit, filter_by='fill_order', raw_output=True)
 
     for data in all_transactions:
@@ -200,14 +188,11 @@ def get_fill_order():
 
         cursor.execute(sql_insert)
         mariadb_connection.commit()
-    mariadb_connection.close()
 
     return
 
 
 def get_transfers():
-    cursor = mariadb_connection.cursor()
-
     all_transactions = Account(steem_username, steem).get_account_history(-1, INT_steem_limit, filter_by='transfer', raw_output=True)
 
     for data in all_transactions:
@@ -252,14 +237,12 @@ def get_transfers():
 
         cursor.execute(sql_insert)
         mariadb_connection.commit()
-    mariadb_connection.close()
 
 
     return
 
 
 def check_exists_transaction(table, trx_id):
-    cursor = mariadb_connection.cursor()
 
     sql_search = ("""
     
@@ -312,18 +295,28 @@ parser.add_argument("--get_transfers", help="Download only information from bloc
 args = parser.parse_args()
 
 if args.createdb:
+    cursor = mariadb_connection.cursor()
     create_sql()
+    mariadb_connection.close()
 
 if args.run:
+    cursor = mariadb_connection.cursor()
     get_claim_rewards()
     get_fill_order()
     get_transfers()
+    mariadb_connection.close()
 
 if args.get_claim_rewards:
+    cursor = mariadb_connection.cursor()
     get_claim_rewards()
+    mariadb_connection.close()
 
 if args.get_fill_order:
+    cursor = mariadb_connection.cursor()
     get_fill_order()
+    mariadb_connection.close()
 
 if args.get_transfers:
+    cursor = mariadb_connection.cursor()
     get_transfers()
+    mariadb_connection.close()
