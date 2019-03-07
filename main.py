@@ -130,6 +130,11 @@ def get_claim_rewards():
 
         filled = ""
 
+        value = check_exists_transaction("claim_rewards", trx_id)
+
+        if value is True:
+            break
+
         sql_insert = ("""
         
         INSERT INTO claim_rewards (trx_id, block, trx_in_block, op_in_trx, virtual_op, timestamp, account,reward_steem, reward_sbd, reward_vests, link, filled)
@@ -179,6 +184,11 @@ def get_fill_order():
 
         filled = ""
 
+        value = check_exists_transaction("fill_order", trx_id)
+
+        if value is True:
+            break
+
         sql_insert = ("""
         
         INSERT INTO fill_order (trx_id,	block, trx_in_block, op_in_trx, virtual_op,	timestamp,	current_owner, current_orderid,	current_pays, open_owner, open_orderid, open_pays, link, filled)
@@ -226,6 +236,11 @@ def get_transfers():
 
         filled = ""
 
+        value = check_exists_transaction("transfers", trx_id)
+
+        if value is True:
+            break
+
         sql_insert = ("""
         
         INSERT INTO transfers (trx_id,	block, trx_in_block, op_in_trx, virtual_op,	timestamp, from_, to_, amount, memo, link, filled)
@@ -241,6 +256,24 @@ def get_transfers():
 
     return
 
+
+def check_exists_transaction(table, trx_id):
+    cursor = mariadb_connection.cursor()
+
+    sql_search = ("""
+    
+    select * FROM %s
+    where trx_id="%s";
+    """) % (str(table), str(trx_id))
+
+    cursor.execute(sql_search)
+
+    raw_search = cursor.fetchall()
+
+    if len(raw_search) == 0:
+        return False
+    else:
+        return True
 
 # Load config file
 
@@ -258,3 +291,6 @@ steem_username = config['steem']['username']
 
 # SQL Connection
 mariadb_connection = mariadb.connect(user=user_db, password=password_db, database=database_db, host=address_db, port=INT_port_db)
+
+
+check_exists_transaction("transfers", "ae553a29f373a9dc5e23da8e65e6ba7c6b2a8da4!!!")
