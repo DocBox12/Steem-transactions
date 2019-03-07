@@ -75,7 +75,7 @@ Info! I'm not found official documentation which would contain an explanation of
 
 ## Transfers
 
-**from** - name of the sender
-**to** - the recipient's name
-**amount** - amount steem in transfer
-**memo** - message in transaction
+- **from** - name of the sender
+- **to** - the recipient's name
+- **amount** - amount steem in transfer
+- ***memo** - message in transaction
