@@ -61,7 +61,7 @@ def get_fill_order():
         current_owner = DICT_op.get("current_owner")
         current_orderid = DICT_op.get("current_orderid")
         current_pays = DICT_op.get("current_pays")
-        current_pays = DICT_op.get("current_pays")
+        open_owner = DICT_op.get("open_owner")
         open_orderid = DICT_op.get("open_orderid")
         open_pays = DICT_op.get("open_pays")
 
