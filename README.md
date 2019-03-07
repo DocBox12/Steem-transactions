@@ -41,37 +41,37 @@ This is script that download information about user transactions from Steem Bloc
 
 # Tables structure in database
 
-The script create 3 table in database: author_rewards, fill_order and create_transfers.
+The script create 3 table in database: **author_rewards**, **fill_order** and **transfers**.
 
 ## Elements common to all tables
 
 Info! I'm not found official documentation which would contain an explanation of the this terms. This description has been created on base analyze work blockchain and information from the Internet.
 
-trx_id - transaction identifier in the whole blockchain
-block - block number
-trx_in_block - transaction in block
-op_in_trx - 
-virtual_op - virtual operations returned by full nodes
-**timestamp** - time created element in the Steem blockchain. Format: YYYY-MM-DD HH:MM:S
-link - a link to a website that shows information about transactions in graphical form - it does not come from blockchain, is generate by program.
-filled - empty field for use - it does not come from blockchain, is generate by program.
+- **trx_id** - transaction identifier in the whole blockchain
+- **block** - block number
+- **trx_in_block** - transaction in block
+- **op_in_trx** - 
+- **virtual_op** - virtual operations returned by full nodes
+- **timestamp** - time created element in the Steem blockchain. Format: YYYY-MM-DD HH:MM:S
+- **link** - a link to a website that shows information about transactions in graphical form - it does not come from blockchain, is generate by program.
+ - **filled** - empty field for use - it does not come from blockchain, is generate by program.
 
 ## Author rewards
 
-author - user the prize went to
-permlink - link to post
-sbd_payout - reward in steem dollar
-steem_payout - reward in steem 
-vesting_payout - reward in VESTS
+- **author** - user the prize went to
+- **permlink** - link to post
+- **sbd_payout** - reward in steem dollar
+- **steem_payout** - reward in steem 
+- **vesting_payout** - reward in VESTS
 
 ## Fill order
 
-current_owner - creator of the offer
-current_orderid -  
-current_pays - amount of the offer
-open_owner - user accepting the offer
-open_orderid - 
-open_pays - earned cryptocurrency on sales
+- **current_owner** - creator of the offer
+- **current_orderid** -  
+- **current_pays** - amount of the offer
+- **open_owner** - user accepting the offer
+- **open_orderid** - 
+- **open_pays** - earned cryptocurrency on sales
 
 ## Transfers
 
