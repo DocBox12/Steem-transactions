@@ -4,12 +4,99 @@ from steem import Steem
 from steem.account import Account
 import datetime
 import time
+import mysql.connector as mariadb
+import configparser
+import os
 
 steem = Steem()
 
+def create_sql():
+    
+    
+    create_claim_rewards = ("""
+    CREATE TABLE claim_rewards (
+    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    trx_id TEXT NULL,
+    block TEXT NULL,
+    trx_in_block TEXT NULL,
+    op_in_trx TEXT NULL,
+    virtual_op TEXT NULL,
+    timestamp TEXT NULL,
+    account TEXT NULL,
+    reward_steem TEXT NULL,
+    reward_sbd TEXT NULL,
+    reward_vests TEXT NULL,
+    link TEXT NULL,
+    filled TEXT NULL
+    );
+
+    
+    """)
+
+
+    create_fill_order = ("""
+    
+    CREATE TABLE fill_order (
+    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    trx_id TEXT NULL,
+    block TEXT NULL,
+    trx_in_block TEXT NULL,
+    op_in_trx TEXT NULL,
+    virtual_op TEXT NULL,
+    timestamp TEXT NULL,
+    current_owner TEXT NULL,
+    current_orderid TEXT NULL,
+    current_pays TEXT NULL,
+    open_orderid TEXT NULL,
+    open_pays TEXT NULL,
+    link TEXT NULL,
+    filled TEXT NULL
+    );
+
+    
+    """)
+
+
+    create_transfers = ("""
+    
+    CREATE TABLE transfers (
+    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    trx_id TEXT NULL,
+    block TEXT NULL,
+    trx_in_block TEXT NULL,
+    op_in_trx TEXT NULL,
+    virtual_op TEXT NULL,
+    timestamp TEXT NULL,
+    from_ TEXT NULL,
+    to_ TEXT NULL,
+    amount TEXT NULL,
+    memo TEXT NULL
+    );
+    
+    """)
+
+
+    cursor.execute(create_claim_rewards)
+    mariadb_connection.commit()
+
+    cursor.execute(create_fill_order)
+    mariadb_connection.commit()
+
+    cursor.execute(create_transfers)
+    mariadb_connection.commit()
+
+    mariadb_connection.close()
+
+
+    
+    return
+
+
+
+
 def get_claim_rewards():
 
-    all_transactions = Account('docbox', steem).get_account_history(-1, 100, filter_by='claim_reward_balance', raw_output=True)
+    all_transactions = Account(steem_username, steem).get_account_history(-1, 100, filter_by='claim_reward_balance', raw_output=True)
 
     for data in all_transactions:
         DICT_details = data[1]
@@ -41,7 +128,7 @@ def get_claim_rewards():
 
 def get_fill_order():
 
-    all_transactions = Account('docbox', steem).get_account_history(-1, 100, filter_by='fill_order', raw_output=True)
+    all_transactions = Account(steem_username, steem).get_account_history(-1, 100, filter_by='fill_order', raw_output=True)
 
     for data in all_transactions:
         DICT_details = data[1]
@@ -73,7 +160,7 @@ def get_fill_order():
 
 
 def get_transfers():
-    all_transactions = Account('docbox', steem).get_account_history(-1, 100, filter_by='transfer', raw_output=True)
+    all_transactions = Account(steem_username, steem).get_account_history(-1, 100, filter_by='transfer', raw_output=True)
 
     for data in all_transactions:
         DICT_details = data[1]
@@ -104,3 +191,22 @@ def get_transfers():
 
 
     return
+
+
+# Load config file
+
+config = configparser.ConfigParser()
+config_file = os.path.join(os.path.dirname(__file__), 'config.ini')
+config.read(config_file)
+
+address_db = config['database']['address']
+user_db = config['database']['user']
+password_db = config['database']['password']
+database_db = config['database']['database_name']
+port_db =config['database']['port']
+INT_port_db = int(port_db)
+steem_username = config['steem']['username']
+
+# SQL Connection
+mariadb_connection = mariadb.connect(user=user_db, password=password_db, database=database_db, host=address_db, port=INT_port_db)
+cursor = mariadb_connection.cursor()
