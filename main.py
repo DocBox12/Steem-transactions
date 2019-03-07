@@ -101,7 +101,7 @@ def create_sql():
 def get_claim_rewards():
     cursor = mariadb_connection.cursor()
 
-    all_transactions = Account(steem_username, steem).get_account_history(-1, 100, filter_by='claim_reward_balance', raw_output=True)
+    all_transactions = Account(steem_username, steem).get_account_history(-1, INT_steem_limit, filter_by='claim_reward_balance', raw_output=True)
 
     for data in all_transactions:
         DICT_details = data[1]
@@ -154,7 +154,7 @@ def get_claim_rewards():
 def get_fill_order():
     cursor = mariadb_connection.cursor()
 
-    all_transactions = Account(steem_username, steem).get_account_history(-1, 100, filter_by='fill_order', raw_output=True)
+    all_transactions = Account(steem_username, steem).get_account_history(-1, INT_steem_limit, filter_by='fill_order', raw_output=True)
 
     for data in all_transactions:
         DICT_details = data[1]
@@ -207,7 +207,7 @@ def get_fill_order():
 def get_transfers():
     cursor = mariadb_connection.cursor()
 
-    all_transactions = Account(steem_username, steem).get_account_history(-1, 100, filter_by='transfer', raw_output=True)
+    all_transactions = Account(steem_username, steem).get_account_history(-1, INT_steem_limit, filter_by='transfer', raw_output=True)
 
     for data in all_transactions:
         DICT_details = data[1]
@@ -288,9 +288,8 @@ database_db = config['database']['database_name']
 port_db =config['database']['port']
 INT_port_db = int(port_db)
 steem_username = config['steem']['username']
+steem_limit = config['steem']['limit']
+INT_steem_limit = int(steem_limit)
 
 # SQL Connection
 mariadb_connection = mariadb.connect(user=user_db, password=password_db, database=database_db, host=address_db, port=INT_port_db)
-
-
-check_exists_transaction("transfers", "ae553a29f373a9dc5e23da8e65e6ba7c6b2a8da4!!!")
