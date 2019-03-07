@@ -7,6 +7,7 @@ import time
 import mysql.connector as mariadb
 import configparser
 import os
+import argparse
 
 steem = Steem()
 
@@ -133,7 +134,7 @@ def get_claim_rewards():
         value = check_exists_transaction("claim_rewards", trx_id)
 
         if value is True:
-            break
+            continue
 
         sql_insert = ("""
         
@@ -187,7 +188,7 @@ def get_fill_order():
         value = check_exists_transaction("fill_order", trx_id)
 
         if value is True:
-            break
+            continue
 
         sql_insert = ("""
         
@@ -239,7 +240,7 @@ def get_transfers():
         value = check_exists_transaction("transfers", trx_id)
 
         if value is True:
-            break
+            continue
 
         sql_insert = ("""
         
@@ -293,3 +294,36 @@ INT_steem_limit = int(steem_limit)
 
 # SQL Connection
 mariadb_connection = mariadb.connect(user=user_db, password=password_db, database=database_db, host=address_db, port=INT_port_db)
+
+# Arguments / flags
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--createdb", help="Create tables in database", action="store_true")
+
+parser.add_argument("--run", help="Download all informations from blockchain", action="store_true")
+
+parser.add_argument("--get_claim_rewards", help="Download only information from blockchain marked as claim reward", action="store_true")
+
+parser.add_argument("--get_fill_order", help="Download only information from blockchain marked as fill_order", action="store_true")
+
+parser.add_argument("--get_transfers", help="Download only information from blockchain marked as transfers", action="store_true")
+
+args = parser.parse_args()
+
+if args.createdb:
+    create_sql()
+
+if args.run:
+    get_claim_rewards()
+    get_fill_order()
+    get_transfers()
+
+if args.get_claim_rewards:
+    get_claim_rewards()
+
+if args.get_fill_order:
+    get_fill_order()
+
+if args.get_transfers:
+    get_transfers()
