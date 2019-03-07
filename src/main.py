@@ -213,7 +213,7 @@ def get_transfers():
 
         DICT_op = LIST_op[1]
         
-        from_ = DICT_op.get("from_")
+        from_ = DICT_op.get("from")
         to = DICT_op.get("to")
         amount = DICT_op.get("amount")
         memo = DICT_op.get("memo")
