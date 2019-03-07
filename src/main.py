@@ -14,8 +14,8 @@ steem = Steem()
 def create_sql():
     
     
-    create_claim_rewards = ("""
-    CREATE TABLE claim_rewards (
+    create_author_rewards = ("""
+    CREATE TABLE author_rewards (
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     trx_id TEXT NULL,
     block TEXT NULL,
@@ -23,10 +23,11 @@ def create_sql():
     op_in_trx TEXT NULL,
     virtual_op TEXT NULL,
     timestamp TEXT NULL,
-    account TEXT NULL,
-    reward_steem TEXT NULL,
-    reward_sbd TEXT NULL,
-    reward_vests TEXT NULL,
+    author TEXT NULL,
+    permlink TEXT NULL,
+    sbd_payout TEXT NULL,
+    steem_payout TEXT NULL,
+    vesting_payout TEXT NULL,
     link TEXT NULL,
     filled TEXT NULL
     );
@@ -79,7 +80,7 @@ def create_sql():
     
     """)
 
-    cursor.execute(create_claim_rewards)
+    cursor.execute(create_author_rewards)
     mariadb_connection.commit()
 
     cursor.execute(create_fill_order)
@@ -93,8 +94,8 @@ def create_sql():
 
 
 
-def get_claim_rewards():
-    all_transactions = Account(steem_username, steem).get_account_history(-1, INT_steem_limit, filter_by='claim_reward_balance', raw_output=True)
+def get_author_rewards():
+    all_transactions = Account(steem_username, steem).get_account_history(-1, INT_steem_limit, filter_by='author_reward', raw_output=True)
 
     for data in all_transactions:
         DICT_details = data[1]
@@ -111,29 +112,30 @@ def get_claim_rewards():
         LIST_op = DICT_details.get("op")
 
         DICT_op = LIST_op[1]
-        account = DICT_op.get("account")
-        reward_steem = DICT_op.get("reward_steem")
-        reward_sbd = DICT_op.get("reward_sbd")
-        reward_vests = DICT_op.get("reward_vests")
+        author = DICT_op.get("author")
+        permlink = DICT_op.get("permlink")
+        sbd_payout = DICT_op.get("sbd_payout")
+        steem_payout = DICT_op.get("steem_payout")
+        vesting_payout = DICT_op.get("vesting_payout")
 
 
         # Generate link to block
 
-        link = "https://steemworld.org/block/" + str(block) + "/" + str(trx_id)
+        link = "https://steemworld.org/block/" + str(block)
 
         filled = ""
 
-        value = check_exists_transaction("claim_rewards", trx_id)
+        value = check_exists_transaction("author_rewards", permlink)
 
         if value is True:
             continue
 
         sql_insert = ("""
         
-        INSERT INTO claim_rewards (trx_id, block, trx_in_block, op_in_trx, virtual_op, timestamp, account,reward_steem, reward_sbd, reward_vests, link, filled)
-        VALUES("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s", "%s");
+        INSERT INTO author_rewards (trx_id, block, trx_in_block, op_in_trx, virtual_op, timestamp, author, permlink, sbd_payout, steem_payout, vesting_payout, link, filled)
+        VALUES("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s");
 
-        """) % (str(trx_id), str(block), str(trx_in_block), str(op_in_trx), str(virtual_op), str(human_time), str(account), str(reward_steem), str(reward_sbd), str(reward_vests), str(link), str(filled))
+        """) % (str(trx_id), str(block), str(trx_in_block), str(op_in_trx), str(virtual_op), str(human_time), str(author), str(permlink), str(sbd_payout), str(steem_payout), str(vesting_payout), str(link), str(filled))
 
 
         cursor.execute(sql_insert)
@@ -286,7 +288,7 @@ parser.add_argument("--createdb", help="Create tables in database", action="stor
 
 parser.add_argument("--run", help="Download all informations from blockchain", action="store_true")
 
-parser.add_argument("--get_claim_rewards", help="Download only information from blockchain marked as claim reward", action="store_true")
+parser.add_argument("--get_author_rewards", help="Download only information from blockchain marked as author reward", action="store_true")
 
 parser.add_argument("--get_fill_order", help="Download only information from blockchain marked as fill_order", action="store_true")
 
@@ -301,14 +303,14 @@ if args.createdb:
 
 if args.run:
     cursor = mariadb_connection.cursor()
-    get_claim_rewards()
+    get_author_rewards()
     get_fill_order()
     get_transfers()
     mariadb_connection.close()
 
-if args.get_claim_rewards:
+if args.get_author_rewards:
     cursor = mariadb_connection.cursor()
-    get_claim_rewards()
+    get_author_rewards()
     mariadb_connection.close()
 
 if args.get_fill_order:
