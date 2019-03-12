@@ -3,7 +3,7 @@
 This is script that download information about user transactions from Steem Blockchain. The following information is retrieved:
 
 - author rewards
-- fill order
+- fill orders
 - transfers
 
 # Requirements
