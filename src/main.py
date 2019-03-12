@@ -125,7 +125,7 @@ def get_author_rewards():
 
         filled = ""
 
-        value = check_exists_transaction("author_rewards", permlink)
+        value = check_exists_transaction("author_rewards", permlink, "permlink")
 
         if value is True:
             continue
@@ -175,7 +175,7 @@ def get_fill_order():
 
         filled = ""
 
-        value = check_exists_transaction("fill_order", trx_id)
+        value = check_exists_transaction("fill_order", trx_id, "trx_id")
 
         if value is True:
             continue
@@ -224,7 +224,8 @@ def get_transfers():
 
         filled = ""
 
-        value = check_exists_transaction("transfers", trx_id)
+        value = check_exists_transaction("transfers", trx_id, "trx_id")
+
 
         if value is True:
             continue
@@ -244,13 +245,13 @@ def get_transfers():
     return
 
 
-def check_exists_transaction(table, trx_id):
+def check_exists_transaction(table, trx_id, cell):
 
     sql_search = ("""
     
     select * FROM %s
-    where trx_id="%s";
-    """) % (str(table), str(trx_id))
+    where %s="%s";
+    """) % (str(table), str(cell), str(trx_id))
 
     cursor.execute(sql_search)
 
