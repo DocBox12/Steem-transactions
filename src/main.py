@@ -226,7 +226,7 @@ def get_transfers():
 
         value = check_exists_transaction("transfers", trx_id, "trx_id")
 
-        print(value)
+
         if value is True:
             continue
 
