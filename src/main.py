@@ -253,8 +253,6 @@ def check_exists_transaction(table, trx_id, cell):
     where %s="%s";
     """) % (str(table), str(cell), str(trx_id))
 
-    print(sql_search)
-
     cursor.execute(sql_search)
 
     raw_search = cursor.fetchall()
