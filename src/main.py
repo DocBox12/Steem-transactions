@@ -80,6 +80,26 @@ def create_sql():
     
     """)
 
+    fill_vesting_withdraw = ("""
+    
+    CREATE TABLE fill_vesting_withdraw (
+    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    trx_id TEXT NULL,
+    block TEXT NULL,
+    trx_in_block TEXT NULL,
+    op_in_trx TEXT NULL,
+    virtual_op TEXT NULL,
+    timestamp TEXT NULL,
+    from_account TEXT NULL,
+    to_account TEXT NULL,
+    withdrawn TEXT NULL,
+    deposited TEXT NULL,
+    link TEXT NULL,
+    filled TEXT NULL
+    );
+    
+    """)
+
     cursor.execute(create_author_rewards)
     mariadb_connection.commit()
 
@@ -87,6 +107,9 @@ def create_sql():
     mariadb_connection.commit()
 
     cursor.execute(create_transfers)
+    mariadb_connection.commit()
+
+    cursor.execute(fill_vesting_withdraw)
     mariadb_connection.commit()
     
     return
@@ -244,6 +267,56 @@ def get_transfers():
 
     return
 
+def get_fill_vesting_withdraw():
+    all_transactions = Account(steem_username, steem).get_account_history(-1, INT_steem_limit, filter_by='fill_vesting_withdraw', raw_output=True)
+
+    for data in all_transactions:
+        DICT_details = data[1]
+
+        trx_id = DICT_details.get("trx_id")
+        block = DICT_details.get("block")
+        trx_in_block = DICT_details.get("trx_in_block")
+        op_in_trx = DICT_details.get("op_in_trx")
+        virtual_op = DICT_details.get("virtual_op")
+        timestamp = DICT_details.get("timestamp")
+
+        human_time = datetime.datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S')
+
+        LIST_op = DICT_details.get("op")
+
+        DICT_op = LIST_op[1]
+        
+        from_account = DICT_op.get("from_account")
+        to_account = DICT_op.get("to_account")
+        withdrawn = DICT_op.get("withdrawn")
+        deposited = DICT_op.get("deposited")
+
+
+        # Generate link to block
+
+        link = "https://steemworld.org/block/" + str(block)
+
+        filled = ""
+
+        value = check_exists_transaction("fill_vesting_withdraw", human_time, "timestamp")
+
+        if value is True:
+            continue
+
+        sql_insert = ("""
+        
+        INSERT INTO fill_vesting_withdraw (trx_id,	block, trx_in_block, op_in_trx, virtual_op,	timestamp, from_account, to_account, withdrawn, deposited, link, filled)
+        VALUES("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s", "%s");
+
+        """) % (str(trx_id), str(block), str(trx_in_block), str(op_in_trx), str(virtual_op), str(human_time), str(from_account), str(to_account), str(withdrawn), str(deposited), str(link), str(filled))
+
+
+        cursor.execute(sql_insert)
+        mariadb_connection.commit()
+
+
+    return
+
 
 def check_exists_transaction(table, trx_id, cell):
 
@@ -295,6 +368,8 @@ parser.add_argument("--get_fill_order", help="Download only information from blo
 
 parser.add_argument("--get_transfers", help="Download only information from blockchain marked as transfers", action="store_true")
 
+parser.add_argument("--get_vesting_withdraw", help="Download only information from blockchain marked as vesting withdraw", action="store_true")
+
 args = parser.parse_args()
 
 if args.createdb:
@@ -322,4 +397,9 @@ if args.get_fill_order:
 if args.get_transfers:
     cursor = mariadb_connection.cursor()
     get_transfers()
+    mariadb_connection.close()
+
+if args.get_vesting_withdraw:
+    cursor = mariadb_connection.cursor()
+    get_fill_vesting_withdraw()
     mariadb_connection.close()
