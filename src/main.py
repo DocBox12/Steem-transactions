@@ -8,6 +8,8 @@ import mysql.connector as mariadb
 import configparser
 import os
 import argparse
+import requests
+import json
 
 steem = Steem()
 
@@ -316,6 +318,35 @@ def get_fill_vesting_withdraw():
 
 
     return
+
+
+# This function is for developers, is not necessary to working app.
+def convert_vests_to_steem(vests):
+    # DOC: https://developers.steem.io/tutorials-recipes/vest-to-steem
+    parameters = '{"jsonrpc":"2.0", "method":"condenser_api.get_dynamic_global_properties", "params":[], "id":1}'
+
+    response = requests.post('https://api.steemit.com/', data=parameters)
+
+    if response.status_code == 200:
+        raw_data_from_json = json.loads(response.content.decode("utf-8"))
+    else:
+        print("I can not download data from api")
+        return
+
+    DICT_result = raw_data_from_json.get("result")
+
+    total_vesting_fund_steem = DICT_result.get("total_vesting_fund_steem")
+    total_vesting_shares = DICT_result.get("total_vesting_shares")
+
+    STR_total_vesting_fund_steem = total_vesting_fund_steem.replace("STEEM", "")
+    STR_total_vesting_shares = total_vesting_shares.replace("VESTS", "")
+
+    FLOAT_total_vesting_fund_steem = float(STR_total_vesting_fund_steem)
+    FLOAT_total_vesting_shares = float(STR_total_vesting_shares)
+
+    vestSteem = (FLOAT_total_vesting_fund_steem * float(vests)) / FLOAT_total_vesting_shares
+
+    return vestSteem
 
 
 def check_exists_transaction(table, trx_id, cell):
